@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  db:
+    platform: linux/x86_64
+    image: mysql:5.7
+    container_name: mysql-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: testing
+      MYSQL_ROOT_PASSWORD: abcd123456
+      MYSQL_PASSWORD: abcd123456
+      MYSQL_USER: yhahayuk
+    networks:
+      - app
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    volumes:
+      - db:/var/lib/mysql
+  api:
+    container_name: api
+    restart: always
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    networks:
+      - app
+    environment:
+      DATABASE_NAME: course
+      DATABASE_PORT: 3306
+      DATABASE_USER: abcd123456
+      DATABASE_PASSWORD: abcd123456
+      DATABASE_HOST: mysql-db
+    links:
+      - db
+volumes:
+  db:
+    driver: local
+
+networks:
+  app:
+    external: false
+    name: app
